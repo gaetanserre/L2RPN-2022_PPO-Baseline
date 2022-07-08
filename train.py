@@ -10,7 +10,7 @@ from lightsim2grid import LightSimBackend
 
 import grid2op
 from grid2op.Chronics import MultifolderWithCache
-from grid2op.utils import ScoreL2RPN2022, ScoreL2RPN2020
+from grid2op.utils import ScoreL2RPN2022
 
 from utils import *
 
@@ -39,8 +39,8 @@ def cli():
     parser.add_argument("--training_iter", default=10_000_000, type=int,
                         help="Number of training 'iteration' to perform (default 10_000_000)")
     
-    parser.add_argument("--agent_name", default="GymEnvWithRecoWithDN", type=str,
-                        help="Name for your agent, default 'GymEnvWithRecoWithDN'")
+    parser.add_argument("--agent_name", default="PPO_agent", type=str,
+                        help="Name for your agent, default 'PPO_agent'")
     
     parser.add_argument("--seed", default=-1, type=int,
                         help="Seed to use (default to -1 meaning 'don't seed the env') for the environment (same seed used to train all agents)")
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     nb_process_stats = 8 if not is_windows_or_darwin else 1
     deep_copy = is_windows  # force the deep copy on windows (due to permission issue in symlink in windows)
     verbose = 1
-    SCOREUSED = ScoreL2RPN2020  # ScoreICAPS2021
+    SCOREUSED = ScoreL2RPN2022
     name_stats = "_reco_powerline"
 
     # save / load information (NB agent name is defined later)
@@ -109,9 +109,9 @@ if __name__ == "__main__":
     train_args["gymenv_kwargs"] = {"safe_max_rho": float(args.safe_max_rho)}
     train_args["normalize_act"] = True
     train_args["normalize_obs"] = True
-    train_args["save_every_xxx_steps"] = min(train_args["iterations"] // 10, 100_000)
-    train_args["n_steps"] = 16 # 256
-    train_args["batch_size"] = 16 # 64
+    train_args["save_every_xxx_steps"] = min(max(train_args["iterations"]//10, 1), 500_000)
+    train_args["n_steps"] = 16
+    train_args["batch_size"] = 16
     train_args["learning_rate"] =  float(args.lr)
     
     # Set the right grid2op environment parameters
