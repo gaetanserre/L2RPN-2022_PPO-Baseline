@@ -226,9 +226,9 @@ def train_agent(env, train_args:dict, max_iter:int = None, other_meta_params=Non
 
   print("environment loaded !")
 
-  with open("./preprocess_obs.json", "r", encoding="utf-8") as f:
+  with open(os.path.join(".", "normalization", "preprocess_obs.json"), "r", encoding="utf-8") as f:
     obs_space_kwargs = json.load(f)
-  with open("./preprocess_act.json", "r", encoding="utf-8") as f:
+  with open(os.path.join(".", "normalization", "preprocess_act.json"), "r", encoding="utf-8") as f:
     act_space_kwargs = json.load(f)
   
   return train(env,
