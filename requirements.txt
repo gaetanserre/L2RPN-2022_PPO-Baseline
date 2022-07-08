@@ -2,4 +2,7 @@ grid2op==1.7.1
 l2rpn-baselines==0.6.0.post1
 LightSim2Grid==0.7.0.post1
 stable-baselines3==1.5.0
-torch==1.11.0
+torch==1.12.0
+attr==0.3.1
+numba==0.55.2
+tensorboard==2.9.1
