@@ -13,7 +13,7 @@ class AgentSet(BaseAgent):
   
   def act(self, obs, reward, done=False):
     actions = list(map(lambda agent: agent.act(obs, reward, done), self.agents))
-    sim_rewards = np.array(map(lambda act: obs.simulate(act)[1], actions))
+    sim_rewards = np.array(map(lambda act: obs.simulate(act, 0)[1], actions))
     return actions[np.argmax(sim_rewards)]
 
 
@@ -46,7 +46,6 @@ def make_agent(env, submission_dir, agents_dir):
         agents.append(BaselineAgent(l2rpn_agent))
   
     return AgentSet(agents)
-
 
 
 if __name__ == "__main__":
