@@ -1,7 +1,11 @@
+import pdb
 import warnings
 import torch
 import datetime
 import sys
+import re
+import os
+import copy
 import argparse
 import numpy as np
 
@@ -16,6 +20,9 @@ from utils import *
 from grid2op.Reward import EpisodeDurationReward
 
 from GymEnvWithRecoWithDNWithShuffle import GymEnvWithRecoWithDNWithShuffle
+
+
+ENV_NAME = "l2rpn_wcci_2022"
 
 
 def cli():
@@ -49,12 +56,16 @@ def cli():
                               "will see different chronics (sampling is done for each agent)")
                         )
     
+    parser.add_argument("--chronics_name",
+                        nargs='+',
+                        help="Chronics to use for training")
+    
     return parser.parse_args()
 
 
-if __name__ == "__main__":
-    args = cli()
+def check_cuda(args):
     use_cuda = int(args.has_cuda) >= 1
+    
     if use_cuda >= 1:
         assert torch.cuda.is_available(), "cuda is not available on your machine with pytorch"
         torch.cuda.set_device(int(args.cuda_device))
@@ -63,10 +74,13 @@ if __name__ == "__main__":
         if int(args.cuda_device) != 0:
             warnings.warn("You specified to use a cuda_device (\"--cuda_device = XXX\") yet you tell the program not to use cuda (\"--has_cuda = 0\"). "
                           "This program will ignore the \"--cuda_device = XXX\" directive.")
-        
-    ENV_NAME = "l2rpn_wcci_2022"
-    # ENV_NAME = "l2rpn_wcci_2022_dev"
-
+    return use_cuda        
+            
+            
+if __name__ == "__main__":
+    args = cli()
+    use_cuda = check_cuda(args)
+    
     # Split sets and statistics parameters
     is_windows = sys.platform.startswith("win32")
     is_windows_or_darwin = sys.platform.startswith("win32") or sys.platform.startswith("darwin")
@@ -103,12 +117,12 @@ if __name__ == "__main__":
                                      ]
     train_args["act_attr_to_keep"] = ["curtail", "set_storage"]
     train_args["iterations"] = int(args.training_iter)
-    train_args["net_arch"] = [300, 300, 300] # [200, 200, 200, 200]
+    train_args["net_arch"] = [300, 300, 300]
     train_args["gamma"] = 0.999
     train_args["gymenv_kwargs"] = {"safe_max_rho": float(args.safe_max_rho)}
     train_args["normalize_act"] = True
     train_args["normalize_obs"] = True
-    train_args["save_every_xxx_steps"] = min(max(train_args["iterations"]//10, 1), 500_000)
+    train_args["save_every_xxx_steps"] = min(max(train_args["iterations"]//10, 1), 1_000_000)
     train_args["n_steps"] = 16
     train_args["batch_size"] = 16
     train_args["learning_rate"] =  float(args.lr)
@@ -148,19 +162,30 @@ if __name__ == "__main__":
                              backend=LightSimBackend(),
                              chronics_class=MultifolderWithCache,
                              param=param)
+    
+    if args.chronics_name is not None:
+        chron_to_keep = copy.deepcopy(args.chronics_name)
+        def filter_chronics(x, li_to_keep=chron_to_keep):
+            res = False
+            for el in li_to_keep:
+                if re.search(el, x) is not None:
+                    res = True
+                    break
+            return res
+        
     if filter_chronics is not None:
         env_train.chronics_handler.real_data.set_filter(filter_chronics)
     else:
         env_train.chronics_handler.real_data.set_filter(lambda x: True)
         
     # do not forget to load all the data in memory !
-    if float(args.ratio_keep_chronics) >= 1.:
+    if float(args.ratio_keep_chronics) >= 1. or args.chronics_name is not None:
         # otherwise it's reset for each agent
         env_train.chronics_handler.real_data.reset()
-    
+
     # now do the loop to train the agents
     for _ in range(nb_train):
-        if float(args.ratio_keep_chronics) < 1.:
+        if float(args.ratio_keep_chronics) < 1. and args.chronics_name is None:
             # TODO reproductibility !
             ID_TO_KEEP = set(np.random.choice(all_data, size=size_, replace=False))
             def filter_chronics(nm, to_keep=ID_TO_KEEP):
@@ -181,7 +206,5 @@ if __name__ == "__main__":
         # assign a unique name
         agent_name = f"{args.agent_name}_{datetime.datetime.now():%Y%m%d_%H%M%S}"
         train_args["name"] = agent_name
-        
-        ppo_agent = train_agent(env_train,
-                                train_args,
-                                other_meta_params={"ratio_keep_chronics": float(args.ratio_keep_chronics)})
+
+        agent = train_agent(env_train, train_args)
