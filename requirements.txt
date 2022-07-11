@@ -1,4 +1,4 @@
-grid2op==1.7.1
+grid2op==1.7.2
 l2rpn-baselines==0.6.0.post1
 LightSim2Grid==0.7.0.post1
 stable-baselines3==1.5.0
