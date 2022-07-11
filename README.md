@@ -17,6 +17,6 @@ Run `python[3] train.py -h` to see all available arguments.
 To reproduce the figures (6) and (7) of 
 [Reinforcement learning for Energies of the future and carbon neutrality: a Challenge Design](),
 you need to train several instances of the baseline agent and run:
-```bash
+```
 python[3] make_figure[6|7].py
 ```
