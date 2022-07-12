@@ -12,7 +12,7 @@ class BaselineAgent(BaseAgent):
   def act(self, obs, reward, done=False):
     action = self.l2rpn_agent.act(obs, reward, done)
     # We try to limit to end up with a "game over" because actions on curtailment or storage units.
-    action.limit_curtail_storage(obs, margin=150)
+    action.limit_curtail_storage(obs, margin=100)
     return action
 
 
@@ -35,7 +35,7 @@ def make_agent(env, submission_dir, agent_name):
                     load_path=agent_dir,
                     name=agent_name,
                     gymenv_class=GymEnvWithRecoWithDNWithShuffle,
-                    gymenv_kwargs={"safe_max_rho": 0.9},
+                    gymenv_kwargs={"safe_max_rho": 0.95},
                     obs_space_kwargs=obs_space_kwargs,
                     act_space_kwargs=act_space_kwargs)
 
