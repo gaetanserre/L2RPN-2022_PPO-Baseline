@@ -35,7 +35,7 @@ def make_agent(env, submission_dir, agent_name):
                     load_path=agent_dir,
                     name=agent_name,
                     gymenv_class=GymEnvWithRecoWithDNWithShuffle,
-                    gymenv_kwargs={"safe_max_rho": 0.9},
+                    gymenv_kwargs={"safe_max_rho": 0.95},
                     obs_space_kwargs=obs_space_kwargs,
                     act_space_kwargs=act_space_kwargs)
 
