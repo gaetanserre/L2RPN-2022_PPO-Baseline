@@ -12,7 +12,7 @@ class BaselineAgent(BaseAgent):
   def act(self, obs, reward, done=False):
     action = self.l2rpn_agent.act(obs, reward, done)
     # We try to limit to end up with a "game over" because actions on curtailment or storage units.
-    action.limit_curtail_storage(obs, margin=150)
+    action.limit_curtail_storage(obs, margin=100)
     return action
 
 

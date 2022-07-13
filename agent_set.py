@@ -40,7 +40,7 @@ def make_agent(env, submission_dir, agents_dir):
                       load_path=agents_dir,
                       name=d,
                       gymenv_class=GymEnvWithRecoWithDNWithShuffle,
-                      gymenv_kwargs={"safe_max_rho": 0.9},
+                      gymenv_kwargs={"safe_max_rho": 0.95},
                       obs_space_kwargs=obs_space_kwargs,
                       act_space_kwargs=act_space_kwargs)
         agents.append(BaselineAgent(l2rpn_agent))
