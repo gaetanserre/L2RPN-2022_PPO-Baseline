@@ -3,13 +3,14 @@ import numpy as np
 import json
 import os
 from l2rpn_baselines.PPO_SB3 import evaluate
-from GymEnvWithRecoWithDNWithShuffle import GymEnvWithRecoWithDNWithShuffle
-from single_agent import BaselineAgent
+from .GymEnvWithRecoWithDNWithShuffle import GymEnvWithRecoWithDNWithShuffle
+from .single_agent import BaselineAgent
 
-class AgentSet(BaseAgent):
+class MixtureExperts(BaseAgent):
   def __init__(self, agents):
     assert len(agents) > 0
     self.agents = agents
+    BaseAgent.__init__(self, self.agents[0].l2rpn_agent.action_space)
   
   def act(self, obs, reward, done=False):
     actions = list(map(lambda agent: agent.act(obs, reward, done), self.agents))
@@ -45,7 +46,7 @@ def make_agent(env, submission_dir, agents_dir):
                       act_space_kwargs=act_space_kwargs)
         agents.append(BaselineAgent(l2rpn_agent))
   
-    return AgentSet(agents)
+    return MixtureExperts(agents)
 
 
 if __name__ == "__main__":

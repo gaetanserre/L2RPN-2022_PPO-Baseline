@@ -2,7 +2,7 @@ from grid2op.Agent import BaseAgent
 from l2rpn_baselines.PPO_SB3 import evaluate
 import os
 import json
-from GymEnvWithRecoWithDNWithShuffle import GymEnvWithRecoWithDNWithShuffle
+from .GymEnvWithRecoWithDNWithShuffle import GymEnvWithRecoWithDNWithShuffle
 
 class BaselineAgent(BaseAgent):
   def __init__(self, l2rpn_agent):
@@ -35,7 +35,7 @@ def make_agent(env, submission_dir, agent_name):
                     load_path=agent_dir,
                     name=agent_name,
                     gymenv_class=GymEnvWithRecoWithDNWithShuffle,
-                    gymenv_kwargs={"safe_max_rho": 1.0},
+                    gymenv_kwargs={"safe_max_rho": 0.99},
                     obs_space_kwargs=obs_space_kwargs,
                     act_space_kwargs=act_space_kwargs)
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
   import grid2op
 
   env = grid2op.make("input_data_local", backend=LightSimBackend())
-  agent_set = make_agent(env, ".", "PPO_agent1_20220709_152030")
+  agent_set = make_agent(env, ".", "Chron_20500214_20220711_175843_learning_rate_0")
 
   nb_steps = 0
   obs = env.reset()
