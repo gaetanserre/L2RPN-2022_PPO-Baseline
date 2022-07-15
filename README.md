@@ -14,9 +14,13 @@ python[3] train.py [args]
 ```
 Run `python[3] train.py -h` to see all available arguments.
 
-To reproduce the figures (6) and (7) of 
+To reproduce the figures (6), (7) and (8) of 
 [Reinforcement learning for Energies of the future and carbon neutrality: a Challenge Design](),
-you need to train several instances of the baseline agent and run:
-```
-python[3] make_figure[6|7].py
-```
+check the corresponding `make_figure_n.ipynb` notebook.
+
+You need to train several instances of the baseline agent before
+running these notebooks.
+
+### Work in progress
+We used this code to generate the results of
+[Reinforcement learning for Energies of the future and carbon neutrality: a Challenge Design]() but we still need to clean it.
