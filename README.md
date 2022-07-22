@@ -24,6 +24,6 @@ You need to train several instances of the baseline agent before
 running these notebooks.
 
 ### Work in progress
-We used this code to generate the results of
+We used this code to make the experiments of
 [Reinforcement learning for Energies of the future and carbon neutrality: a Challenge Design](https://arxiv.org/abs/2207.10330)
 but we are still working on cleaning it up.
