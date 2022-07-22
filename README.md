@@ -1,8 +1,10 @@
 ## L2RPN WCCI 2022 PPO Baseline
 
-This repository contains the code to create and train the Proximal Policy Optimization baseline
-provided in the [2022 edition of Learning to Run a Power Network](https://codalab.lisn.upsaclay.fr/competitions/5410).
+This repository contains the code to train the baseline agent
+provided in the [2022 edition of Learning to Run a Power Network](https://codalab.lisn.upsaclay.fr/competitions/5410) and to recreate the
+experiments (along with the figures) of the paper [Reinforcement learning for Energies of the future and carbon neutrality: a Challenge Design](https://arxiv.org/abs/2207.10330).
 
+This agent uses the Proximal [Policy Optimization algorithm](https://arxiv.org/abs/1707.06347).
 
 ### Usage
 You need python>=3.8.6
