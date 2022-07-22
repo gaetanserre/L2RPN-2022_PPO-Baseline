@@ -23,4 +23,5 @@ running these notebooks.
 
 ### Work in progress
 We used this code to generate the results of
-[Reinforcement learning for Energies of the future and carbon neutrality: a Challenge Design]() but we are still working on cleaning it up.
+[Reinforcement learning for Energies of the future and carbon neutrality: a Challenge Design](https://arxiv.org/abs/2207.10330)
+but we are still working on cleaning it up.
