@@ -28,7 +28,7 @@ def balance_dataset(observations, flags):
   return df["observations"].to_list(), df["flags"].to_list()
 
 def cli():
-  parser = argparse.ArgumentParser(description="Generate chronics data")
+  parser = argparse.ArgumentParser(description="Create observations dataset")
   parser.add_argument("--env_name", required=True, type=str,
                       help="The name of the environment from which to select the scenarios")
   parser.add_argument("--n_obs", required=True, type=int,
