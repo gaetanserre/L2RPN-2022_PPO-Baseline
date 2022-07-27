@@ -16,9 +16,33 @@ def create_obs_dataset(filename):
   lengths.append(len(observations) - (lengths[0] + lengths[1]))
   return random_split(obs, lengths)
 
-def plot_loss(losses, label, path=None):
-  plt.plot(range(len(losses)), losses, label=label)
-  plt.xlabel("Epoch")
+def plot_learning_curve(losses, y_label, path=None):
+  x_plt = range(len(losses))
+  x_displ = [el + 1 for el in x_plt]
+
+  plt.figure(figsize=(10, 6))
+  plt.fill_between(x_displ,
+                  y1=[losses[el][0] for el in x_plt],
+                  y2=[losses[el][4] for el in x_plt],
+                  color="cornflowerblue",
+                  alpha=0.3,
+                  label=f"[{percentiles[0]}%-{percentiles[-1]}%]"
+                  )
+  plt.fill_between(x_displ,
+                  y1=[losses[el][1] for el in x_plt],
+                  y2=[losses[el][3] for el in x_plt],
+                  color="cornflowerblue",
+                  alpha=0.7,
+                  label=f"[{percentiles[1]}%-{percentiles[-2]}%]"
+                  )
+  plt.plot(x_displ,
+          [losses[el][2] for el in x_plt], 
+          color="cornflowerblue",
+          label="median")
+
+  plt.xlabel("Epoch", fontsize=15)
+  plt.ylabel(y_label, fontsize=15)
+  plt.grid()
   plt.legend()
 
   if path is not None:
@@ -82,38 +106,60 @@ def train_autoencoder(ae,
 
   test_loss = get_test_loss(ae, loss, test_obs, batch_size)
   print(f"Test loss {test_loss:.4f}")
-  plot_loss(train_losses, "Train loss")
-  plot_loss(valid_losses, "Valid loss")
+
+  return test_loss, train_losses, valid_losses
 
 def cli():
-  parser = argparse.ArgumentParser(description="Train auto-encoder")
+  parser = argparse.ArgumentParser(description="Train autoencoder")
   parser.add_argument("--nb_epochs", required=True, type=int,
                       help="Number of epochs")
   parser.add_argument("--batch_size", default=64, type=int,
                       help="Batch size")
   parser.add_argument("--latent_dim", default=40, type=int,
                       help="Dimension of the latent space")
+  parser.add_argument("--arch_enc", nargs="+", type=int,
+                      default=[],
+                      help="Architecture of hidden layers for the encoder")
+  parser.add_argument("--arch_dec", nargs="+", type=int,
+                      default=[],
+                      help="Architecture of hidden layers for the decoder")
+  parser.add_argument("--nb_models", default=10, type=int,
+                      help="Number of model instances to run")
+  parser.add_argument("--output_weights", default="ae_weights", type=str,
+                      help="Where to save the autoencoder's weights")
   
   return parser.parse_args()
 
 if __name__ == "__main__":
   args = cli()
 
-  train_obs, valid_obs, test_obs = create_obs_dataset("dataset_254397obs.npz")
-  obs_shape = train_obs[0][0].shape[0]
+  train_losses = []
+  val_losses = []
+  test_losses = np.zeros(args.nb_models)
+  percentiles = [20, 40, 50, 60, 80]
 
-  arch_enc = [1024, 800]
-  arch_dec = [800, 1024]
-  ae = AutoEncoder(obs_shape, args.latent_dim, arch_enc, arch_dec).to(device)
-  loss = torch.nn.MSELoss()
-  optimizer = torch.optim.Adam(ae.parameters(), weight_decay=1e-4)
+  for i in range(args.nb_models):
+    train_obs, valid_obs, test_obs = create_obs_dataset("dataset_254397obs.npz")
 
+    obs_shape = train_obs[0][0].shape[0]
+    ae = AutoEncoder(obs_shape, args.latent_dim, args.arch_enc, args.arch_dec).to(device)
+    optimizer = torch.optim.Adam(ae.parameters(), weight_decay=1e-4)
 
-  train_autoencoder(ae,
-                    loss,
-                    optimizer,
-                    train_obs,
-                    valid_obs,
-                    test_obs,
-                    args.nb_epochs,
-                    args.batch_size)
+    loss = torch.nn.MSELoss()
+
+    test_losses[i], train_loss, val_loss = train_autoencoder(ae,
+                                                          loss,
+                                                          optimizer,
+                                                          train_obs,
+                                                          valid_obs,
+                                                          test_obs,
+                                                          args.nb_epochs,
+                                                          args.batch_size)
+    
+    train_losses.append([np.percentile(train_loss, percentile) for percentile in percentiles])
+    val_losses.append([np.percentile(val_loss, percentile) for percentile in percentiles])
+
+  plot_learning_curve(train_losses, "Train loss", path="train_loss.pdf")
+  plot_learning_curve(val_losses, "Valid loss", path="val_loss.pdf")
+  print(f"Test loss mean: {test_losses.mean():.4f}, std: {test_losses.std():.4f} and median: {np.median(test_losses):.4f}")
+  torch.save(ae.state_dict(), args.output_weights+".pty")

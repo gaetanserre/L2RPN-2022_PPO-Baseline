@@ -14,7 +14,7 @@ class Encoder(nn.Module):
       input_dim = l
 
     self.fcs = nn.Sequential(*layers)
-    self.last_fc = nn.Linear(arch[-1], latent_dim)
+    self.last_fc = nn.Linear(input_dim, latent_dim)
 
   def forward(self, inputs):
     h = self.fcs(inputs)
@@ -31,7 +31,7 @@ class Decoder(nn.Module):
       latent_dim = l
 
     self.fcs = nn.Sequential(*layers)
-    self.last_fc = nn.Linear(arch[-1], input_dim)
+    self.last_fc = nn.Linear(latent_dim, input_dim)
   
   def forward(self, inputs):
     h = self.fcs(inputs)
