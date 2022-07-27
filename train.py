@@ -15,11 +15,11 @@ import grid2op
 from grid2op.Chronics import MultifolderWithCache
 from grid2op.utils import ScoreL2RPN2022
 
-from utils import *
+from src.utils import *
 
 from grid2op.Reward import EpisodeDurationReward
 
-from GymEnvWithRecoWithDNWithShuffle import GymEnvWithRecoWithDNWithShuffle
+from src.GymEnvWithRecoWithDNWithShuffle import GymEnvWithRecoWithDNWithShuffle
 
 
 ENV_NAME = "l2rpn_wcci_2022"
