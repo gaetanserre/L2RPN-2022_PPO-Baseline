@@ -8,6 +8,7 @@ from l2rpn_baselines.utils import GymEnvWithRecoWithDN
 from grid2op.gym_compat import BoxGymObsSpace
 import json
 import pandas as pd
+import os
 
 def balance_dataset(observations, flags):
   dataset = {"observations": observations, "flags": flags}
@@ -45,7 +46,7 @@ if __name__ == "__main__":
   env = grid2op.make(args.env_name, backend=LightSimBackend())
   env.chronics_handler.real_data.shuffle()
   
-  with open("../normalization/preprocess_obs.json", "r", encoding="utf-8") as f:
+  with open(os.path.join(".", "normalization", "preprocess_obs.json"), "r", encoding="utf-8") as f:
     obs_space_kwargs = json.load(f)
   obs_attr_to_keep = ["month", "day_of_week", "hour_of_day", "minute_of_hour",
                                   "gen_p", "load_p", 

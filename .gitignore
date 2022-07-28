@@ -3,4 +3,4 @@ __pycache__/
 saved_model/
 logs/
 exps/**/*.npz
-exps/**/*.pty
+exps/**/*.pt

@@ -1,11 +1,13 @@
-from l2rpn_baselines.PPO_SB3 import train
-from stable_baselines3.ppo import MlpPolicy
 import torch as th
-from typing import Tuple
-from gym.spaces.box import Box
 import numpy as np
 
-class AEMlpPolicy(MlpPolicy):
+from gym.spaces.box import Box
+
+from stable_baselines3.common.policies import ActorCriticPolicy
+from stable_baselines3.common.distributions import Distribution
+from typing import Tuple
+
+class AEMlpPolicy(ActorCriticPolicy):
   def __init__(
       self,
       observation_space,
@@ -29,6 +31,22 @@ class AEMlpPolicy(MlpPolicy):
   def forward(self, obs: th.Tensor, **kwargs) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
     h = self.ae(obs)
     return super().forward(h, **kwargs)
+
+  def _predict(self, observation: th.Tensor, **kwargs) -> th.Tensor:
+    h = self.ae(observation)
+    return super()._predict(h, **kwargs)
+  
+  def evaluate_actions(self, obs: th.Tensor, actions: th.Tensor) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
+    h = self.ae(obs)
+    return super().evaluate_actions(h, actions)
+  
+  def get_distribution(self, obs: th.Tensor) -> Distribution:
+    h = self.ae(obs)
+    return super().get_distribution(h)
+  
+  def predict_values(self, obs: th.Tensor) -> th.Tensor:
+    h = self.ae(obs)
+    return super().predict_values(h)
 
   def get_parameters(self, trainable=False):
     return sum(p.numel() for p in self.parameters() if not trainable or p.requires_grad)

@@ -29,6 +29,12 @@ ENV_NAME = "l2rpn_wcci_2022"
 
 def cli():
     parser = argparse.ArgumentParser(description="Train baseline PPO")
+    parser.add_argument("--ae_weights", required=True, type=str,
+                        help="Path to the autoencoder's weights file")
+    
+    parser.add_argument("--latent_dim", required=True, type=int,
+                        help="Dimension of the latent space")
+
     parser.add_argument("--has_cuda", default=1, type=int,
                         help="Is pytorch installed with cuda support ? (default True)")
     
@@ -129,7 +135,7 @@ if __name__ == "__main__":
     train_args["batch_size"] = 16
     train_args["learning_rate"] = float(args.lr)
     train_args["model_policy"] = AEMlpPolicy
-    train_args["policy_kwargs"] = {"ae_weights": "train_ae/ae_weights.pty", "latent_dim": 400}
+    train_args["policy_kwargs"] = {"ae_weights": args.ae_weights, "latent_dim": args.latent_dim}
     
     # Set the right grid2op environment parameters
     filter_chronics = None        

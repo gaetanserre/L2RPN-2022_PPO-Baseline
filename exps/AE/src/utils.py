@@ -220,6 +220,7 @@ def train_agent(env, train_args:dict, max_iter:int = None, other_meta_params=Non
   dict_to_json["device"] = str(dict_to_json["device"])
   dict_to_json["reward"] = str(type(env.get_reward_instance()))
   dict_to_json["other_meta_params"] = copy.deepcopy(other_meta_params)
+  dict_to_json["model_policy"] = dict_to_json["model_policy"].__name__
   os.makedirs(os.path.join(train_args["save_path"], train_args["name"]), exist_ok=True)
   with open(full_path, 'x') as fp:
     json.dump(dict_to_json, fp, indent=4)
