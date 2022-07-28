@@ -38,7 +38,7 @@ class Decoder(nn.Module):
     return self.last_fc(h)
 
 class AutoEncoder(nn.Module):
-  def __init__(self, input_dim, latent_dim, arch_enc, arch_dec):
+  def __init__(self, input_dim, latent_dim, arch_enc=[], arch_dec=[]):
     super().__init__()
     
     self.encoder = Encoder(input_dim, latent_dim, arch_enc)
