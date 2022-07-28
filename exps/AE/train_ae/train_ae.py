@@ -4,22 +4,24 @@ from ae import AutoEncoder
 
 import numpy as np
 
-import torch
+import torch as th
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader, random_split
 
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = th.device("cuda" if th.cuda.is_available() else "cpu")
 print(f"Using {device} device")
+
 
 def create_obs_dataset(filename):
   observations = np.load(filename)["observations"]
-  obs          = TensorDataset(torch.from_numpy(observations))
+  obs          = TensorDataset(th.from_numpy(observations))
   lengths      = [int(i*len(observations)) for i in [0.7, 0.2]]
   lengths.append(len(observations) - (lengths[0] + lengths[1]))
   return random_split(obs, lengths)
+
 
 def plot_learning_curve(losses, y_label, percentiles, path=None):
   x_plt   = range(losses.shape[1])
@@ -60,6 +62,7 @@ def plot_learning_curve(losses, y_label, percentiles, path=None):
   else:
     plt.show()
 
+
 def get_test_loss(ae, loss, obs, batch_size):
   ae.eval()
 
@@ -77,6 +80,7 @@ def get_test_loss(ae, loss, obs, batch_size):
 
   ae.train()
   return avg_loss / nb_batch
+
 
 def train_autoencoder(ae,
                       loss,
@@ -124,8 +128,11 @@ def train_autoencoder(ae,
 
   return test_loss, train_losses, valid_losses
 
+
 def cli():
   parser = argparse.ArgumentParser(description="Train autoencoder")
+  parser.add_argument("--dataset", required=True, type=str,
+                      help="Path to the dataset")
   parser.add_argument("--nb_epochs", required=True, type=int,
                       help="Number of epochs")
   parser.add_argument("--batch_size", default=64, type=int,
@@ -145,6 +152,7 @@ def cli():
   
   return parser.parse_args()
 
+
 if __name__ == "__main__":
   args = cli()
 
@@ -154,13 +162,13 @@ if __name__ == "__main__":
   percentiles  = [20, 40, 60, 80]
 
   for i in tqdm(range(args.nb_models)):
-    train_obs, valid_obs, test_obs = create_obs_dataset("dataset_254397obs.npz")
+    train_obs, valid_obs, test_obs = create_obs_dataset(args.dataset)
 
     obs_shape = train_obs[0][0].shape[0]
     ae        = AutoEncoder(obs_shape, args.latent_dim, args.arch_enc, args.arch_dec).to(device)
-    optimizer = torch.optim.Adam(ae.parameters(), weight_decay=1e-4)
+    optimizer = th.optim.Adam(ae.parameters(), weight_decay=1e-4)
 
-    loss = torch.nn.L1Loss()
+    loss = th.nn.L1Loss()
 
     test_losses[i], train_loss, val_loss = train_autoencoder(ae,
                                                           loss,
@@ -177,4 +185,6 @@ if __name__ == "__main__":
   plot_learning_curve(train_losses, "Train loss", percentiles, path="train_loss.pdf")
   plot_learning_curve(val_losses, "Valid loss", percentiles, path="val_loss.pdf")
   print(f"Test loss mean: {test_losses.mean():.4f}, std: {test_losses.std():.4f} and median: {np.median(test_losses):.4f}")
-  torch.save(ae.state_dict(), args.output_weights+".pty")
+
+  ae_scripted = th.jit.script(ae) # Export to TorchScript
+  ae_scripted.save(args.output_weights+".pt")

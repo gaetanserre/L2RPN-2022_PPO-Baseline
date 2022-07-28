@@ -45,7 +45,7 @@ if __name__ == "__main__":
   env = grid2op.make(args.env_name, backend=LightSimBackend())
   env.chronics_handler.real_data.shuffle()
   
-  with open("./preprocess_obs.json", "r", encoding="utf-8") as f:
+  with open("../normalization/preprocess_obs.json", "r", encoding="utf-8") as f:
     obs_space_kwargs = json.load(f)
   obs_attr_to_keep = ["month", "day_of_week", "hour_of_day", "minute_of_hour",
                                   "gen_p", "load_p", 
@@ -67,10 +67,10 @@ if __name__ == "__main__":
   n_obs = 0
   observations = []
   flags        = []
-  while n_obs < args.n_obs:
-    obs = env.reset()
-    done = False
-    with tqdm(total=obs.max_step) as pbar:
+  with tqdm(total=args.n_obs) as pbar:
+    while n_obs < args.n_obs:
+      obs = env.reset()
+      done = False
       while not done:
         n_obs += 1
         observations.append(obs_to_gym.to_gym(obs))

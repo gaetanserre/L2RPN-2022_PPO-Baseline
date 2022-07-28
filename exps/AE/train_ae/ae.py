@@ -1,6 +1,5 @@
-import torch
+import torch as th
 import torch.nn as nn
-import torch.functional as F
 
 
 class Encoder(nn.Module):
@@ -18,7 +17,8 @@ class Encoder(nn.Module):
 
   def forward(self, inputs):
     h = self.fcs(inputs)
-    return self.last_fc(h)
+    h = self.last_fc(h)
+    return th.sigmoid(h)
 
 class Decoder(nn.Module):
   def __init__(self, latent_dim, input_dim, arch):
