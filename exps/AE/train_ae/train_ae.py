@@ -125,7 +125,8 @@ def train_autoencoder(ae,
   test_loss = get_test_loss(ae, loss, test_obs, batch_size)
   if verbose:
     print(f"Test loss {test_loss:.4f}")
-
+  
+  ae.eval()
   return test_loss, train_losses, valid_losses
 
 
