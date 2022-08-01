@@ -7,4 +7,4 @@ python train_policy.py \
 --nb_training 1 \
 --chronics_name="2050-02-14" \
 --agent_name AEMlpPolicy \
---training_iter 1000000
+--training_iter 10000000
