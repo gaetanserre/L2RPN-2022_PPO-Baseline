@@ -1,4 +1,3 @@
-import re
 import torch as th
 import numpy as np
 import copy
@@ -9,7 +8,6 @@ from stable_baselines3.common.policies import ActorCriticPolicy
 from stable_baselines3.common.distributions import Distribution
 from typing import Dict, Optional, Tuple, Union
 from stable_baselines3.common.preprocessing import is_image_space, maybe_transpose
-from stable_baselines3.common.utils import obs_as_tensor
 
 class AEMlpPolicy(ActorCriticPolicy):
   def __init__(

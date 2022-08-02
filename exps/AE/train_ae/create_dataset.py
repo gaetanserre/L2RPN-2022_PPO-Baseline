@@ -19,7 +19,6 @@ def balance_dataset(observations, flags):
   nb_min = nb_obs_per_flag.min()
   idx_flag_min = nb_obs_per_flag.argmin()
 
-
   for i, flag in enumerate(flag_values):
     if i == idx_flag_min: continue
 
